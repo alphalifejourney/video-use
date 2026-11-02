@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 520" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<defs>
+  <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="8" height="8" fill="#EEE"/><line x1="0" y1="0" x2="0" y2="8" stroke="#BBB" stroke-width="3"/>
+  </pattern>
+</defs>
+<rect width="760" height="520" rx="16" fill="#FFFFFF" stroke="#E5E5E5"/>
+<rect width="760" height="44" rx="16" fill="#F7F5F0"/><rect y="28" width="760" height="16" fill="#F7F5F0"/>
+<circle cx="24" cy="22" r="6" fill="#E06C5A"/><circle cx="44" cy="22" r="6" fill="#E8B04B"/><circle cx="64" cy="22" r="6" fill="#74AA9C"/>
+<text x="380" y="27" text-anchor="middle" font-size="13" fill="#666">Example · Cut the umms and dead air (illustration)</text>
+
+<!-- user bubble -->
+<text x="730" y="70" text-anchor="end" font-size="11" fill="#999">You</text>
+<rect x="330" y="78" width="400" height="44" rx="14" fill="#F3F1EC"/>
+<text x="348" y="106" font-size="14" fill="#111">Cut out the umms and long pauses in take_01.mp4</text>
+
+<!-- claude -->
+<circle cx="38" cy="150" r="9" fill="#C15F3C"/><text x="54" y="154" font-size="11" fill="#999">Claude · video-use skill</text>
+
+<!-- BEFORE -->
+<text x="40" y="190" font-size="12" fill="#666" font-weight="700">BEFORE · raw take · 38.0s</text>
+<text x="158" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#C15F3C">umm</text>
+<text x="304" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#666">dead air 2.5s</text>
+<text x="447" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#C15F3C">uh</text>
+<text x="598" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#666">dead air 2.8s</text>
+<g>
+  <rect x="40" y="222" width="110.9" height="40" rx="4" fill="#4796E3"/>
+  <rect x="150.9" y="222" width="14.3" height="40" fill="#C15F3C"/>
+  <rect x="165.2" y="222" width="116.3" height="40" rx="4" fill="#4796E3"/>
+  <rect x="281.5" y="222" width="44.7" height="40" fill="url(#hatch)"/>
+  <rect x="326.2" y="222" width="114.5" height="40" rx="4" fill="#4796E3"/>
+  <rect x="440.7" y="222" width="12.6" height="40" fill="#C15F3C"/>
+  <rect x="453.3" y="222" width="119.8" height="40" rx="4" fill="#4796E3"/>
+  <rect x="573.1" y="222" width="50.1" height="40" fill="url(#hatch)"/>
+  <rect x="623.2" y="222" width="96.6" height="40" rx="4" fill="#4796E3"/>
+</g>
+<text x="95" y="247" text-anchor="middle" font-size="12" fill="#fff">"Hi, I'm…"</text>
+<text x="223" y="247" text-anchor="middle" font-size="12" fill="#fff">"…three tips"</text>
+<text x="383" y="247" text-anchor="middle" font-size="12" fill="#fff">"Tip one…"</text>
+<text x="513" y="247" text-anchor="middle" font-size="12" fill="#fff">"Tip two…"</text>
+<text x="671" y="247" text-anchor="middle" font-size="12" fill="#fff">"Follow…"</text>
+<text x="40" y="280" font-size="10" fill="#999">0s</text><text x="720" y="280" text-anchor="end" font-size="10" fill="#999">38s</text>
+
+<!-- arrow -->
+<path d="M380 294 v26 m-9 -9 l9 9 l9 -9" stroke="#C15F3C" stroke-width="3" fill="none"/>
+
+<!-- AFTER -->
+<text x="40" y="346" font-size="12" fill="#666" font-weight="700">AFTER · edit/final.mp4 · 31.2s</text>
+<g>
+  <rect x="40" y="356" width="558.2" height="40" rx="4" fill="#74AA9C"/>
+  <line x1="150.9" y1="356" x2="150.9" y2="396" stroke="#fff" stroke-width="2"/>
+  <line x1="267.2" y1="356" x2="267.2" y2="396" stroke="#fff" stroke-width="2"/>
+  <line x1="381.7" y1="356" x2="381.7" y2="396" stroke="#fff" stroke-width="2"/>
+  <line x1="501.6" y1="356" x2="501.6" y2="396" stroke="#fff" stroke-width="2"/>
+</g>
+<text x="95" y="381" text-anchor="middle" font-size="12" fill="#fff">"Hi, I'm…"</text>
+<text x="209" y="381" text-anchor="middle" font-size="12" fill="#fff">"…three tips"</text>
+<text x="324" y="381" text-anchor="middle" font-size="12" fill="#fff">"Tip one…"</text>
+<text x="442" y="381" text-anchor="middle" font-size="12" fill="#fff">"Tip two…"</text>
+<text x="550" y="381" text-anchor="middle" font-size="12" fill="#fff">"Follow…"</text>
+<text x="40" y="414" font-size="10" fill="#999">0s</text><text x="598" y="414" text-anchor="end" font-size="10" fill="#999">31.2s</text>
+<text x="612" y="381" font-size="13" font-weight="700" fill="#74AA9C">−6.8s</text>
+
+<!-- summary -->
+<rect x="30" y="436" width="700" height="60" rx="10" fill="#FFF4EE"/>
+<text x="46" y="460" font-size="13" fill="#111">✂️ <tspan font-weight="700">2 fillers + 2 long pauses removed.</tspan> Every cut lands between words,</text>
+<text x="46" y="480" font-size="13" fill="#111">with a 30ms audio fade. Subtitles burned in. Checked every cut before showing you.</text>
+</svg>

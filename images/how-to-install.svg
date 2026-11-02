@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="960" height="400" rx="16" fill="#FFFFFF" stroke="#E5E5E5"/>
+  <text x="480" y="44" text-anchor="middle" font-size="24" font-weight="700" fill="#111">Install in 3 steps (or let Claude Code do it)</text>
+
+  <!-- Step 1 -->
+  <g transform="translate(30,70)">
+    <rect width="280" height="300" rx="14" fill="#FAFAFA" stroke="#DDD"/>
+    <circle cx="36" cy="36" r="20" fill="#C15F3C"/><text x="36" y="43" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">1</text>
+    <text x="66" y="42" font-size="18" font-weight="700" fill="#111">Download &amp; unzip</text>
+    <!-- mini GitHub release page -->
+    <rect x="20" y="70" width="240" height="150" rx="8" fill="#fff" stroke="#DDD"/>
+    <rect x="20" y="70" width="240" height="26" rx="8" fill="#24292F"/>
+    <text x="34" y="88" font-size="12" fill="#fff">github.com · Releases</text>
+    <text x="34" y="120" font-size="13" font-weight="700" fill="#111">video-use – download</text>
+    <text x="34" y="144" font-size="11" fill="#666">Assets</text>
+    <rect x="30" y="154" width="220" height="34" rx="6" fill="#EEF5FD" stroke="#4796E3"/>
+    <text x="44" y="176" font-size="13" fill="#4796E3" font-weight="700">📦 video-use.zip</text>
+    <path d="M222 205 l10 -14 l4 10 l10 -2 z" fill="#111"/>
+    <text x="140" y="250" text-anchor="middle" font-size="14" fill="#333">Click <tspan font-weight="700">Download</tspan> in this</text>
+    <text x="140" y="270" text-anchor="middle" font-size="14" fill="#333">README and unzip it in</text>
+    <text x="140" y="290" text-anchor="middle" font-size="14" fill="#333">your home folder.</text>
+  </g>
+
+  <!-- arrow -->
+  <path d="M318 220 h22 m-8 -8 l8 8 l-8 8" stroke="#C15F3C" stroke-width="3" fill="none"/>
+
+  <!-- Step 2 -->
+  <g transform="translate(340,70)">
+    <rect width="280" height="300" rx="14" fill="#FAFAFA" stroke="#DDD"/>
+    <circle cx="36" cy="36" r="20" fill="#C15F3C"/><text x="36" y="43" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">2</text>
+    <text x="66" y="42" font-size="18" font-weight="700" fill="#111">Set up</text>
+    <!-- mini terminal -->
+    <rect x="20" y="70" width="240" height="150" rx="8" fill="#111"/>
+    <circle cx="36" cy="84" r="4" fill="#E06C5A"/><circle cx="50" cy="84" r="4" fill="#E8B04B"/><circle cx="64" cy="84" r="4" fill="#74AA9C"/>
+    <text x="32" y="114" font-size="11" font-family="Consolas, Menlo, monospace" fill="#74AA9C">&gt;</text>
+    <text x="44" y="114" font-size="11" font-family="Consolas, Menlo, monospace" fill="#fff">python -m venv .venv</text>
+    <text x="32" y="134" font-size="11" font-family="Consolas, Menlo, monospace" fill="#74AA9C">&gt;</text>
+    <text x="44" y="134" font-size="11" font-family="Consolas, Menlo, monospace" fill="#fff">pip install -e .</text>
+    <text x="32" y="154" font-size="11" font-family="Consolas, Menlo, monospace" fill="#74AA9C">&gt;</text>
+    <text x="44" y="154" font-size="11" font-family="Consolas, Menlo, monospace" fill="#fff">winget install ffmpeg</text>
+    <text x="32" y="184" font-size="11" font-family="Consolas, Menlo, monospace" fill="#74AA9C">✓ ready · no API key</text>
+    <text x="140" y="250" text-anchor="middle" font-size="14" fill="#333">Install Python tools</text>
+    <text x="140" y="270" text-anchor="middle" font-size="14" fill="#333">and <tspan font-weight="700">ffmpeg</tspan>. Everything</text>
+    <text x="140" y="290" text-anchor="middle" font-size="14" fill="#333">is free.</text>
+  </g>
+
+  <path d="M628 220 h22 m-8 -8 l8 8 l-8 8" stroke="#C15F3C" stroke-width="3" fill="none"/>
+
+  <!-- Step 3 -->
+  <g transform="translate(650,70)">
+    <rect width="280" height="300" rx="14" fill="#FAFAFA" stroke="#DDD"/>
+    <circle cx="36" cy="36" r="20" fill="#C15F3C"/><text x="36" y="43" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">3</text>
+    <text x="66" y="42" font-size="18" font-weight="700" fill="#111">Connect &amp; ask</text>
+    <rect x="20" y="70" width="240" height="150" rx="8" fill="#fff" stroke="#DDD"/>
+    <text x="34" y="98" font-size="13" font-weight="700" fill="#111">~/.claude/skills/video-use</text>
+    <rect x="198" y="108" width="44" height="22" rx="11" fill="#74AA9C"/><circle cx="231" cy="119" r="8" fill="#fff"/>
+    <text x="34" y="124" font-size="11" fill="#666">Claude Code</text>
+    <line x1="34" y1="138" x2="246" y2="138" stroke="#EEE"/>
+    <rect x="34" y="148" width="212" height="56" rx="10" fill="#F3F1EC"/>
+    <text x="46" y="172" font-size="12" fill="#111">Edit these into a</text>
+    <text x="46" y="190" font-size="12" fill="#111">launch video.</text>
+    <text x="140" y="250" text-anchor="middle" font-size="14" fill="#333">Link the folder into</text>
+    <text x="140" y="270" text-anchor="middle" font-size="14" fill="#333"><tspan font-weight="700">Claude Code</tspan>, open it in</text>
+    <text x="140" y="290" text-anchor="middle" font-size="14" fill="#333">your footage folder, ask.</text>
+  </g>
+</svg>

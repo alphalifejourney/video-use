@@ -1,7 +1,7 @@
 [project]
 name = "video-use"
 version = "0.1.0"
-description = "Conversation-driven video editor skill for Claude Code"
+description = "Conversation-driven video editor skill for Claude Code (free local transcription fork)"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
 dependencies = [
@@ -10,6 +10,11 @@ dependencies = [
     "matplotlib",
     "pillow",
     "numpy",
+    # Free local transcription (helpers/transcribe_local.py)
+    "faster-whisper",
+    # CUDA 12 runtime for faster-whisper on NVIDIA GPUs (falls back to cpu without one)
+    "nvidia-cublas-cu12; sys_platform == 'win32' or sys_platform == 'linux'",
+    "nvidia-cudnn-cu12==9.*; sys_platform == 'win32' or sys_platform == 'linux'",
 ]
 
 [project.optional-dependencies]

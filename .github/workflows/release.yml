@@ -1,0 +1,36 @@
+# Builds a ready-to-download skill zip every time main changes,
+# so people can download it in one click from the Releases page.
+name: Build skill zip
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zip the skill (top-level video-use/ folder)
+        run: |
+          mkdir -p build/video-use
+          cp -r SKILL.md install.md helpers skills pyproject.toml LICENSE README.md README-upstream.md .env.example build/video-use/
+          find build/video-use -name "__pycache__" -type d -prune -exec rm -rf {} +
+          cd build && zip -r ../video-use.zip video-use
+
+      - name: Publish to the "latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest video-use.zip --clobber
+          else
+            gh release create latest video-use.zip \
+              --title "video-use (free local transcription) – download" \
+              --notes "Download video-use.zip below, unzip it to a stable folder, and follow install.md (or ask Claude Code to install it for you)."
+          fi

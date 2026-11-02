@@ -24,8 +24,8 @@ These are the things where deviation produces silent failures or broken output. 
 3. **30ms audio fades at every segment boundary** (`afade=t=in:st=0:d=0.03,afade=t=out:st={dur-0.03}:d=0.03`). Otherwise audible pops at every cut.
 4. **Overlays use `setpts=PTS-STARTPTS+T/TB`** to shift the overlay's frame 0 to its window start. Otherwise you see the middle of the animation during the overlay window.
 5. **Master SRT uses output-timeline offsets**: `output_time = word.start - segment_start + segment_offset`. Otherwise captions misalign after segment concat.
-6. **Never cut inside a word.** Snap every cut edge to a word boundary from the Scribe transcript.
-7. **Pad every cut edge.** Working window: 30–200ms. Scribe timestamps drift 50–100ms — padding absorbs the drift. Tighter for fast-paced, looser for cinematic.
+6. **Never cut inside a word.** Snap every cut edge to a word boundary from the word-level transcript.
+7. **Pad every cut edge.** Working window: 30–200ms. Word timestamps (Whisper or Scribe) drift 50–100ms — padding absorbs the drift. Tighter for fast-paced, looser for cinematic.
 8. **Word-level verbatim ASR only.** Never SRT/phrase mode (loses sub-second gap data). Never normalized fillers (loses editorial signal).
 9. **Cache transcripts per source.** Never re-transcribe unless the source file itself changed.
 10. **Parallel sub-agents for multiple animations.** Never sequential. Spawn N at once via the `Agent` tool; total wall time ≈ slowest one.
@@ -45,7 +45,7 @@ The skill lives in `video-use/`. User footage lives wherever they put it. All se
     ├── project.md               ← memory; appended every session
     ├── takes_packed.md          ← phrase-level transcripts, the LLM's primary reading view
     ├── edl.json                 ← cut decisions
-    ├── transcripts/<name>.json  ← cached raw Scribe JSON
+    ├── transcripts/<name>.json  ← cached word-level transcript JSON (Scribe-shaped)
     ├── animations/slot_<id>/    ← per-animation source + render + reasoning
     ├── clips_graded/            ← per-segment extracts with grade + fades
     ├── master.srt               ← output-timeline subtitles
@@ -57,11 +57,13 @@ The skill lives in `video-use/`. User footage lives wherever they put it. All se
 
 ## Setup
 
-First-time install lives in `install.md` (clone, deps, ffmpeg, skill registration, API key). Don't re-run it every session; on cold start just verify:
+First-time install lives in `install.md` (clone, venv + deps, ffmpeg, skill registration — no API key). Don't re-run it every session; on cold start just verify:
 
-- `ELEVENLABS_API_KEY` resolves — either in the environment or in `.env` at the video-use repo root. If missing, ask the user to paste one and write it to `.env` (never to the user's `<videos_dir>`).
+- **Transcription is local by default — no API key needed.** Use `helpers/transcribe_local.py` (faster-whisper, free, offline) instead of `transcribe.py` / `transcribe_batch.py`. It uses `large-v3` on an NVIDIA GPU and falls back to the `small` model on CPU. Do NOT ask for an `ELEVENLABS_API_KEY`. ElevenLabs Scribe is optional: use it only if the user explicitly asks for it and has a key (in the environment or `.env` at the video-use repo root, never in `<videos_dir>`).
+- Run every helper with the repo's venv python, not system python (which lacks the deps): `<video-use>/.venv/Scripts/python.exe` on Windows, `<video-use>/.venv/bin/python` on macOS/Linux, e.g. `<venv-python> <video-use>/helpers/<name>.py`. On Windows prefix with `PYTHONUTF8=1` (bash) or set `$env:PYTHONUTF8=1` (PowerShell).
 - `ffmpeg` + `ffprobe` on PATH.
-- Python deps installed (`uv sync` or `pip install -e .` inside the repo).
+- Python deps installed in `.venv` (`pip install -e .` inside the repo — includes faster-whisper and, on Windows/Linux, the CUDA 12 runtime wheels).
+- Example (Windows PowerShell; `<skill>` = the folder containing this SKILL.md, e.g. `$env:USERPROFILE\.claude\skills\video-use`; footage in `D:\shoot`): `$env:PYTHONUTF8=1; & "<skill>\.venv\Scripts\python.exe" "<skill>\helpers\transcribe_local.py" "D:\shoot"`, then the same python with `"<skill>\helpers\pack_transcripts.py" --edit-dir "D:\shoot\edit"`, then `"<skill>\helpers\render.py" "D:\shoot\edit\edl.json" -o "D:\shoot\edit\final.mp4"`. macOS/Linux: `<skill>/.venv/bin/python` and forward slashes. Use absolute paths and the working directory doesn't matter.
 - Node.js + npm available if the session needs HyperFrames or Remotion slots. HyperFrames currently requires Node.js 22+.
 - `yt-dlp`, HyperFrames, Remotion, Manim installed only on first use.
 - First-use animation setup happens inside the slot directory, never at the video-use repo root. HyperFrames can be invoked with `npx --yes hyperframes ...`; Remotion can be scaffolded with `npx create-video@latest` or installed as a project-local dependency before using its `remotion render` command.
@@ -71,18 +73,19 @@ Helpers (`helpers/transcribe.py`, `helpers/render.py`, etc.) live alongside this
 
 ## Helpers
 
-- **`transcribe.py <video>`** — single-file Scribe call. `--num-speakers N` optional. Cached.
-- **`transcribe_batch.py <videos_dir>`** — 4-worker parallel transcription. Use for multi-take.
+- **`transcribe_local.py <video | videos_dir>`** — DEFAULT. Local faster-whisper, writes the same Scribe-shaped JSON to the same cache path, so every other helper works unchanged. Single file or whole directory (sequential, one model load). `--language en` skips detection. Cached. Limits: single speaker (all `speaker_0`), no audio-event tags, and Whisper can still swallow some fillers even with its verbatim prompt — when a gap looks suspicious, check `timeline_view` before trusting the transcript.
+- **`transcribe.py <video>`** — single-file ElevenLabs Scribe call (paid, needs key). Only if the user asks. `--num-speakers N` optional. Cached.
+- **`transcribe_batch.py <videos_dir>`** — 4-worker parallel Scribe transcription. Only if the user asks.
 - **`pack_transcripts.py --edit-dir <dir>`** — `transcripts/*.json` → `takes_packed.md` (phrase-level, break on silence ≥ 0.5s).
 - **`timeline_view.py <video> <start> <end>`** — filmstrip + waveform PNG. On-demand visual drill-down. **Not a scan tool** — use it at decision points, not constantly.
 - **`render.py <edl.json> -o <out>`** — per-segment extract → concat → overlays (PTS-shifted) → subtitles LAST. `--preview` for 720p fast. `--build-subtitles` to generate master.srt inline.
 - **`grade.py <in> -o <out>`** — ffmpeg filter chain grade. Presets + `--filter '<raw>'` for custom.
 
-For animations, create `<edit>/animations/slot_<id>/` with `Bash` and spawn a sub-agent via the `Agent` tool.
+For animations, create `<edit>/animations/slot_<id>/` with your shell (Bash or PowerShell) and spawn a sub-agent via the `Agent` tool.
 
 ## The process
 
-1. **Inventory.** `ffprobe` every source. `transcribe_batch.py` on the directory. `pack_transcripts.py` to produce `takes_packed.md`. Sample one or two `timeline_view`s for a visual first impression.
+1. **Inventory.** `ffprobe` every source. `transcribe_local.py` on the directory. `pack_transcripts.py` to produce `takes_packed.md`. Sample one or two `timeline_view`s for a visual first impression.
 2. **Pre-scan for problems.** One pass over `takes_packed.md` to note verbal slips, obvious mis-speaks, or phrasings to avoid. Plain list, feed into the editor brief.
 3. **Converse.** Describe what you see in plain English. Ask questions *shaped by the material*. Collect: content type, target length/aspect, aesthetic/brand direction, pacing feel, must-preserve moments, must-cut moments, animation and grade preferences, subtitle needs. Do not use a fixed checklist — the right questions are different every time.
 4. **Propose strategy.** 4–8 sentences: shape, take choices, cut direction, animation plan, grade direction, subtitle style, length estimate. **Wait for confirmation.**
@@ -252,7 +255,7 @@ This is one style. If the brand is warm and serif, use that. If it's colorful an
 
 **Fonts fail silently.** A web font that didn't load renders in a fallback face with no error — the video ships in "almost Arial". In HyperFrames/Remotion, await the font load and then assert it: `if (!document.fonts.check('700 76px "Inter"')) throw new Error(...)`. In PIL, pass an explicit font path; never rely on the default.
 
-**Worked example — "show the edit" hook** (a launch video for this tool). Instead of a title card, the first 3s visualize the editing itself: each transcript word pops in on its Scribe timestamp, with bars under it drawn from the real audio envelope; a filler ("ummm") grows letter by letter while it is spoken, turns orange and is cut out on screen at the same frame the audio cuts, and the next line lands immediately. It works because the picture is *driven by the same data as the sound* — one composition (Remotion) reads frame-exact word/envelope JSON produced in Python, so nothing can drift. Use the idea whenever the story is "we removed something": make the removal visible.
+**Worked example — "show the edit" hook** (a launch video for this tool). Instead of a title card, the first 3s visualize the editing itself: each transcript word pops in on its transcript timestamp, with bars under it drawn from the real audio envelope; a filler ("ummm") grows letter by letter while it is spoken, turns orange and is cut out on screen at the same frame the audio cuts, and the next line lands immediately. It works because the picture is *driven by the same data as the sound* — one composition (Remotion) reads frame-exact word/envelope JSON produced in Python, so nothing can drift. Use the idea whenever the story is "we removed something": make the removal visible.
 
 **Parallel sub-agent brief** — each animation is one sub-agent spawned via the `Agent` tool. Each prompt is self-contained (sub-agents have no parent context). Include:
 
@@ -297,14 +300,14 @@ Match the source unless the user asked for something specific. Common targets: `
   ],
   "grade": "warm_cinematic",
   "overlays": [
-    {"file": "edit/animations/slot_1/render.mp4", "start_in_output": 0.0, "duration": 5.0}
+    {"file": "animations/slot_1/render.mp4", "start_in_output": 0.0, "duration": 5.0}
   ],
-  "subtitles": "edit/master.srt",
+  "subtitles": "master.srt",
   "total_duration_s": 87.4
 }
 ```
 
-`grade` is a preset name or raw ffmpeg filter. `overlays` are rendered animation clips. `subtitles` is optional and applied LAST.
+`grade` is a preset name or raw ffmpeg filter. `overlays` are rendered animation clips. `subtitles` is optional and applied LAST. Use absolute paths in `sources`; on Windows write them with forward slashes (`"D:/shoot/C0103.MP4"`) or doubled backslashes — single backslashes are invalid JSON. Relative `overlays` paths resolve against the EDL's folder only (write `animations/slot_1/render.mp4`, not `edit/animations/...`); a relative `subtitles` path tries the EDL's folder, then the current directory. Absolute paths avoid the ambiguity.
 
 ## Memory — `project.md`
 
@@ -328,7 +331,7 @@ Things that consistently fail regardless of style:
 - **Hierarchical pre-computed codec formats** with USABILITY / tone tags / shot layers. Over-engineering. Derive from the transcript at decision time.
 - **Hand-tuned moment-scoring functions.** The LLM picks better than any heuristic you'll write.
 - **Whisper SRT / phrase-level output.** Loses sub-second gap data. Always word-level verbatim.
-- **Running Whisper locally on CPU.** Slow and it normalizes fillers. Use hosted Scribe.
+- **Trusting Whisper's filler detection blindly.** Whisper normalizes some fillers away even with `transcribe_local.py`'s verbatim prompt (worse with the CPU `small` model). Check `timeline_view` at suspicious gaps, or use Scribe if the user has a key and fillers matter.
 - **Burning subtitles into base before compositing overlays.** Overlays hide them. (Hard Rule 1.)
 - **Single-pass filtergraph when you have overlays.** Double re-encodes. Use per-segment extract → concat.
 - **Linear animation easing.** Looks robotic. Always cubic.
